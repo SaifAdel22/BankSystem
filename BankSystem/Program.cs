@@ -1,6 +1,6 @@
 ﻿using Azure.Identity;
-using BankSystem.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using StudentSystem.Data;
 
 namespace StudentSystem
@@ -14,6 +14,8 @@ namespace StudentSystem
         {
             using (var context = new AppDbContext())
             {
+                DataSeeder.Seed(context);
+
                 var userService = new UserService(context);
                 var accountService = new AccountService(context);
 
@@ -84,7 +86,38 @@ namespace StudentSystem
                                 }
                                 break;
 
-                            // Additional commands can be added here.
+                            case "Withdraw":
+                                if (input.Length == 3 && decimal.TryParse(input[2], out decimal withdrawAmount))
+                                {
+                                    accountService.Withdraw(input[1], withdrawAmount);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid command format or amount.");
+                                }
+                                break;
+
+                            case "DeductFee":
+                                if (input.Length == 2)
+                                {
+                                    accountService.DeductFee(input[1]);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid command format.");
+                                }
+                                break;
+
+                            case "AddInterest":
+                                if (input.Length == 2)
+                                {
+                                    accountService.AddInterest(input[1]);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid command format.");
+                                }
+                                break;
 
                             default:
                                 Console.WriteLine("Invalid command.");
@@ -206,79 +239,6 @@ namespace StudentSystem
             }
         }
     }
-
-    public class AccountService
-    {
-        private readonly AppDbContext context;
-
-        public AccountService(AppDbContext _context)
-        {
-            context = _context;
-        }
-
-        public void AddSavingAccount(string userName, decimal initialBalance, decimal interestRate)
-        {
-            var user = context.Users.SingleOrDefault(u => u.UserName == userName);
-            if (user != null)
-            {
-                var savingAccount = new SavingAccount
-                {
-                    AccountNumber = GenerateAccountNumber(),
-                    Balance = initialBalance,
-                    InterestRate = interestRate,
-                    User = user
-                };
-                context.SavingAccounts.Add(savingAccount);
-                context.SaveChanges();
-                Console.WriteLine($"Saving account added for {userName}");
-            }
-        }
-
-        public void AddCheckingAccount(string userName, decimal initialBalance, decimal fee)
-        {
-            var user = context.Users.SingleOrDefault(u => u.UserName == userName);
-            if (user != null)
-            {
-                var checkingAccount = new CheckingAccount
-                {
-                    AccountNumber = GenerateAccountNumber(),
-                    Balance = initialBalance,
-                    Fee = fee,
-                    User = user
-                };
-                context.CheckingAccounts.Add(checkingAccount);
-                context.SaveChanges();
-                Console.WriteLine($"Checking account added for {userName}");
-            }
-        }
-
-        public void Deposit(string accountNumber, decimal amount)
-        {
-            var checkingAccount = context.CheckingAccounts.SingleOrDefault(x => x.AccountNumber == accountNumber);
-            var savingAccount = context.SavingAccounts.SingleOrDefault(a => a.AccountNumber == accountNumber);
-
-            if (checkingAccount != null)
-            {
-                checkingAccount.Balance += amount;
-                context.SaveChanges();
-                Console.WriteLine($"Deposited {amount} to checking account {accountNumber}. New balance: {checkingAccount.Balance}");
-            }
-            else if (savingAccount != null)
-            {
-                savingAccount.Balance += amount;
-                context.SaveChanges();
-                Console.WriteLine($"Deposited {amount} to saving account {accountNumber}. New balance: {savingAccount.Balance}");
-            }
-            else
-            {
-                Console.WriteLine("Account not found.");
-            }
-        }
-
-        private string GenerateAccountNumber()
-        {
-            var random = new Random();
-            return new string(Enumerable.Range(0, 10).Select(_ => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[random.Next(36)]).ToArray());
-        }
-    }
 }
+
+
