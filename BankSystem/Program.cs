@@ -42,17 +42,7 @@ namespace StudentSystem
                     }
                     else
                     {
-                        Console.WriteLine("You are logged in as " + LoggedInUser);
-                        Console.WriteLine("Available commands:");
-                        Console.WriteLine(" - Logout");
-                        Console.WriteLine(" - AddSavingAccount <initial balance> <interest rate>");
-                        Console.WriteLine(" - AddCheckingAccount <initial balance> <fee>");
-                        Console.WriteLine(" - ListAccounts");
-                        Console.WriteLine(" - Deposit <Account number> <money>");
-                        Console.WriteLine(" - Withdraw <Account number> <money>");
-                        Console.WriteLine(" - DeductFee <Account number>");
-                        Console.WriteLine(" - AddInterest <Account number>");
-                        Console.WriteLine("Type your command below:");
+                        Commands();
                         var command = Console.ReadLine();
                         var input = command.Split(" ");
                         switch (input[0])
@@ -237,6 +227,21 @@ namespace StudentSystem
             {
                 Console.WriteLine("User not found.");
             }
+        }
+
+        static void Commands()
+        {
+            Console.WriteLine("You are logged in as " + LoggedInUser);
+            Console.WriteLine("Available commands:");
+            Console.WriteLine(" - Logout");
+            Console.WriteLine(" - AddSavingAccount <initial balance> <interest rate>");
+            Console.WriteLine(" - AddCheckingAccount <initial balance> <fee>");
+            Console.WriteLine(" - ListAccounts");
+            Console.WriteLine(" - Deposit <Account number> <money>");
+            Console.WriteLine(" - Withdraw <Account number> <money>");
+            Console.WriteLine(" - DeductFee <Account number>");
+            Console.WriteLine(" - AddInterest <Account number>");
+            Console.WriteLine("Type your command below:");
         }
     }
 }
